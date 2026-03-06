@@ -1,0 +1,13 @@
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backend — nunca subir para o GitHub
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/*.db
+
+# VS Code
+.vscode/

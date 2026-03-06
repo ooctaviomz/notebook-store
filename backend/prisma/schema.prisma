@@ -1,0 +1,36 @@
+// Prisma usa SQLite — sem instalação, sem compilação, funciona em qualquer OS
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./store.db"
+}
+
+model Admin {
+  id           Int    @id @default(autoincrement())
+  email        String @unique
+  passwordHash String
+
+  @@map("admin")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  brand       String
+  name        String
+  category    String
+  description String   @default("")
+  cpu         String   @default("")
+  ram         String   @default("")
+  ssd         String   @default("")
+  screen      String   @default("")
+  price       Float
+  priceOld    Float?
+  isNew       Boolean  @default(true)
+  imgUrl      String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@map("products")
+}

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCI-Informatica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/pci logo.jpeg" type="image/x-icon">
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo">PCI-<span>Informatica</span></div>
+    <nav>
+      <a href="#" onclick="setFilter('todos', document.querySelector('.chip'))">Todos</a>
+      <a href="#" onclick="setChipFilter('gamer')">Gamer</a>
+      <a href="#" onclick="setChipFilter('ultrabook')">Ultrabook</a>
+      <a href="https://wa.me/55SEUNUMEROAQUI" target="_blank" class="nav-whatsapp">&#x1F4AC; Contato</a>
+      <a href="https://instagram.com/informatica_pci" target="_blank" class="nav-instagram">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>@informatica_pci
+      </a>
+    </nav>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span id="logout-btn" style="display:none">
+        <button class="btn-logout" onclick="logout()">Sair</button>
+      </span>
+      <button class="btn-admin" onclick="handleAdminClick()">⚙ Painel Admin</button>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+    <div class="hero-tag">Novos Produtos</div>
+    <h1>Os melhores<br><em>notebooks</em><br>em um só lugar.</h1>
+    <p class="hero-sub">Confira as últimas novidades — sempre atualizadas pelo nosso time.</p>
+  </section>
+
+  <!-- ── FILTROS ── -->
+  <section class="filters">
+    <span class="filter-label">Filtrar:</span>
+    <button class="chip active" onclick="setFilter('todos', this)">Todos</button>
+    <button class="chip" onclick="setFilter('gamer', this)">Gamer</button>
+    <button class="chip" onclick="setFilter('ultrabook', this)">Ultrabook</button>
+    <button class="chip" onclick="setFilter('workstation', this)">Workstation</button>
+    <button class="chip" onclick="setFilter('básico', this)">Básico</button>
+  </section>
+
+  <!-- ── GRID ── -->
+  <section class="grid-section">
+    <div class="section-header">
+      <span class="section-title">Produtos</span>
+      <span class="count-badge" id="count">carregando…</span>
+    </div>
+    <div class="grid" id="grid">
+      <div class="loading">Carregando produtos…</div>
+    </div>
+  </section>
+
+  <!-- ── TOAST ── -->
+  <div class="toast" id="toast">✓ <span id="toast-msg"></span></div>
+
+  <!-- ── MODAL: LOGIN ── -->
+  <div class="overlay" id="loginOverlay">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Acesso Restrito</div>
+          <div class="modal-sub">Entre com suas credenciais de administrador</div>
+        </div>
+        <button class="close-btn" onclick="closeLogin()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>E-mail <span>*</span></label>
+        <input id="l-email" type="email" placeholder="dono@techlab.com" />
+      </div>
+      <div class="form-group">
+        <label>Senha <span>*</span></label>
+        <input id="l-password" type="password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') doLogin()" />
+      </div>
+
+      <div id="login-error" style="display:none;color:var(--red);font-size:.82rem;margin-bottom:16px;padding:10px 14px;background:rgba(255,68,102,.08);border:1px solid rgba(255,68,102,.2);border-radius:8px"></div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeLogin()">Cancelar</button>
+        <button class="btn-primary" id="login-btn" onclick="doLogin()">Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL: PAINEL ADMIN ── -->
+  <div class="overlay" id="adminOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Painel do Dono</div>
+          <div class="modal-sub">Adicione ou remova produtos da vitrine</div>
+        </div>
+        <button class="close-btn" onclick="closeAdmin()">✕</button>
+      </div>
+
+      <div class="admin-list" id="adminList"></div>
+      <div class="admin-section-label">+ Adicionar Novo Produto</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Marca <span>*</span></label>
+          <input id="f-brand" placeholder="Dell, Lenovo, Apple…" />
+        </div>
+        <div class="form-group">
+          <label>Categoria <span>*</span></label>
+          <select id="f-cat">
+            <option value="gamer">Gamer</option>
+            <option value="ultrabook">Ultrabook</option>
+            <option value="workstation">Workstation</option>
+            <option value="básico">Básico</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Nome do Produto <span>*</span></label>
+        <input id="f-name" placeholder="Ex: Dell Inspiron G15" />
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea id="f-desc" placeholder="Breve descrição do notebook…"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Processador</label>
+          <input id="f-cpu" placeholder="Intel i7-13700H" />
+        </div>
+        <div class="form-group">
+          <label>Memória RAM</label>
+          <input id="f-ram" placeholder="16GB DDR5" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Armazenamento</label>
+          <input id="f-ssd" placeholder="512GB NVMe" />
+        </div>
+        <div class="form-group">
+          <label>Tela</label>
+          <input id="f-screen" placeholder='15.6" FHD 144Hz' />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Preço (R$) <span>*</span></label>
+          <input id="f-price" type="number" placeholder="4999" />
+        </div>
+        <div class="form-group">
+          <label>Preço Anterior (R$)</label>
+          <input id="f-price-old" type="number" placeholder="Deixe vazio se não houver" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>URL da Imagem</label>
+        <input id="f-img" placeholder="https://… (deixe vazio para ícone padrão)" />
+      </div>
+
+      <div class="form-row" style="margin-bottom:0">
+        <div class="form-group">
+          <div class="toggle-row">
+            <span class="toggle-label">Marcar como NOVO</span>
+            <label class="toggle">
+              <input type="checkbox" id="f-new" checked>
+              <div class="toggle-track"></div>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="toggle-row">
+            <span class="toggle-label">Em destaque</span>
+            <label class="toggle">
+              <input type="checkbox" id="f-featured">
+              <div class="toggle-track"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeAdmin()">Fechar</button>
+        <button class="btn-primary" id="add-btn" onclick="addProduct()">+ Publicar Produto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL: DETALHE DO PRODUTO ── -->
+  <div class="overlay" id="detailOverlay">
+    <div class="detail-modal">
+      <div class="detail-img" id="detail-img-wrap">
+        <div class="img-placeholder" id="detail-placeholder">💻</div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-brand" id="detail-brand"></div>
+        <div class="detail-name" id="detail-name"></div>
+        <div class="detail-desc" id="detail-desc"></div>
+        <div class="detail-specs-grid" id="detail-specs"></div>
+        <div class="detail-price" id="detail-price"></div>
+        <button class="btn-primary" onclick="closeDetail()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
