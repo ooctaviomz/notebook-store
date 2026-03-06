@@ -7,6 +7,9 @@ const ICONS = {
   workstation: '🖥️', básico: '💻'
 };
 
+// ▶ COLOQUE O NÚMERO DA LOJA AQUI (só números, com DDI+DDD)
+const WHATSAPP_NUMBER = '555198371140';
+
 // ── UTILITÁRIOS ──────────────────────────────────────────────────
 function fmtPrice(value) {
   return 'R$ ' + Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
@@ -15,6 +18,28 @@ function fmtPrice(value) {
 function setLoading(btn, text, loading) {
   btn.disabled = loading;
   btn.textContent = loading ? '…' : text;
+}
+
+// ── WHATSAPP ─────────────────────────────────────────────────────
+function buyViaWhatsApp(p) {
+  const specs = [
+    p.cpu    && `• Processador: ${p.cpu}`,
+    p.ram    && `• Memória: ${p.ram}`,
+    p.ssd    && `• Armazenamento: ${p.ssd}`,
+    p.screen && `• Tela: ${p.screen}`,
+  ].filter(Boolean).join('\n');
+
+  const msg =
+`Olá! Tenho interesse em comprar:
+
+*${p.brand} — ${p.name}*
+${specs ? specs + '\n' : ''}
+💰 *${fmtPrice(p.price)}*
+
+Poderia me ajudar com mais informações?`;
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
 }
 
 // ── INICIALIZAÇÃO ────────────────────────────────────────────────
@@ -72,6 +97,9 @@ function render() {
       : '';
     const phStyle = p.imgUrl ? 'display:none' : '';
 
+    // Serializa o produto de forma segura para o onclick
+    const pJson = encodeURIComponent(JSON.stringify(p));
+
     card.innerHTML = `
       <div class="card-img">
         ${imgContent}
@@ -94,8 +122,8 @@ function render() {
             <div class="price">${fmtPrice(p.price)}</div>
           </div>
           <button class="btn-buy"
-            onclick="event.stopPropagation(); showToast('Adicionado ao carrinho!')">
-            Comprar
+            onclick="event.stopPropagation(); buyViaWhatsApp(JSON.parse(decodeURIComponent('${pJson}')))">
+            💬 Comprar
           </button>
         </div>
       </div>`;
@@ -222,7 +250,7 @@ async function addProduct() {
 
   try {
     const priceOldVal = parseFloat(document.getElementById('f-price-old').value);
-    const newProduct = await createProduct({
+    await createProduct({
       brand,
       name,
       category:    document.getElementById('f-cat').value,
@@ -241,6 +269,7 @@ async function addProduct() {
       .forEach(id => document.getElementById(id).value = '');
     document.getElementById('f-new').checked = true;
 
+    products = await fetchProducts();
     renderAdminList();
     render();
     closeAdmin();
@@ -271,10 +300,10 @@ function openDetail(p) {
     ph.textContent = ICONS[p.category] || '💻';
   }
 
-  document.getElementById('detail-brand').textContent  = p.brand + ' · ' + p.category.toUpperCase();
-  document.getElementById('detail-name').textContent   = p.name;
-  document.getElementById('detail-desc').textContent   = p.description;
-  document.getElementById('detail-price').textContent  = fmtPrice(p.price);
+  document.getElementById('detail-brand').textContent = p.brand + ' · ' + p.category.toUpperCase();
+  document.getElementById('detail-name').textContent  = p.name;
+  document.getElementById('detail-desc').textContent  = p.description;
+  document.getElementById('detail-price').textContent = fmtPrice(p.price);
 
   const specs = [
     ['Processador', p.cpu], ['Memória RAM', p.ram],
@@ -286,6 +315,13 @@ function openDetail(p) {
       <div class="detail-spec-label">${k}</div>
       <div class="detail-spec-val">${v}</div>
     </div>`).join('');
+
+  // Botão comprar no modal de detalhe
+  const pJson = encodeURIComponent(JSON.stringify(p));
+  document.getElementById('detail-buy-btn').onclick = () => {
+    buyViaWhatsApp(p);
+    closeDetail();
+  };
 
   document.getElementById('detailOverlay').classList.add('open');
 }
