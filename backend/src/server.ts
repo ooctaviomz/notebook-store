@@ -5,6 +5,12 @@ import { PrismaClient } from '@prisma/client';
 import { authRoutes } from './routes/auth';
 import { productRoutes } from './routes/products';
 
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log("Servidor rodando na porta " + port);
+});
+
 dotenv.config();
 
 const app    = Fastify({ logger: false });
