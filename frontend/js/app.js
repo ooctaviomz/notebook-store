@@ -6,7 +6,11 @@ const ICONS = {
   gamer: '🎮', ultrabook: '✨',
   workstation: '🖥️', básico: '💻'
 };
+const port = process.env.PORT || 3000;
 
+app.listen(port, () => {
+  console.log("Servidor rodando na porta " + port);
+});
 // ▶ COLOQUE O NÚMERO DA LOJA AQUI (só números, com DDI+DDD)
 const WHATSAPP_NUMBER = '555198371140';
 
