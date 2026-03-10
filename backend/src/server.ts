@@ -5,12 +5,6 @@ import { PrismaClient } from '@prisma/client';
 import { authRoutes } from './routes/auth';
 import { productRoutes } from './routes/products';
 
-{
-  "scripts": {
-    "start": "npx ts-node src/server.ts"
-  }
-}
-
 dotenv.config();
 
 const app    = Fastify({ logger: false });
